@@ -6,35 +6,31 @@
 trigger:
 - main
 
-pool:
-  vmImage: ubuntu-latest
+stages:
+- stage: TEST
 
-jobs:
-- job: Setup
-  steps:
-  - task: UseRubyVersion@0
-    inputs:
-      versionSpec: '= 3.0.4'
+  pool:
+    vmImage: ubuntu-latest
 
-  - script: |
-      gem install bundler
-      bundle install --retry=3 --jobs=4
-    displayName: 'bundle install'
+  jobs:
+  - job: Setup
+    steps:
+    - task: UseRubyVersion@0
+      inputs:
+        versionSpec: '= 3.0.4'
 
-- job: Checks
-  steps:
-  - script: bundle exec rake
-    displayName: 'bundle exec rake'
+    - script: |
+        gem install bundler
+        bundle install --retry=3 --jobs=4
+      displayName: 'bundle install'
 
+    - script: bundle exec rake
+      displayName: 'bundle exec rake'
 
-- job: Containerize
-  steps:
-  - script: echo 'docker build'
-    displayName: 'build docker image'
-  - script: echo 'docker push'
-    displayName: 'publish docker image'
+    - script: echo 'docker build'
+      displayName: 'build docker image'
+    - script: echo 'docker push'
+      displayName: 'publish docker image'
 
-- job: Deploy
-  steps:
-  - script: echo 'kat select'
-    displayName: 'KAT select or create TEST'
+    - script: echo 'kat select'
+      displayName: 'KAT select or create TEST'
